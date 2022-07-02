@@ -53,7 +53,7 @@ def get_hand_value(hand: list) -> int:
     return value
 
 
-def check_result(player_hand: list, dealer_hand: list) -> bool:
+def check_result(player_hand: list, dealer_hand: list, last_player_choice='') -> bool:
     player_hand_value = get_hand_value(player_hand)
     dealer_hand_value = get_hand_value(dealer_hand)
 
@@ -69,6 +69,8 @@ def check_result(player_hand: list, dealer_hand: list) -> bool:
             or player_hand_value > 21 and dealer_hand_value > 21:
         print('Draw')
     elif dealer_hand_value > player_hand_value > 17 and dealer_hand_value > 17:
+        print('Dealer win')
+    elif last_player_choice == 's' and dealer_hand_value > 17 and player_hand_value < dealer_hand_value:
         print('Dealer win')
     else:
         return False
@@ -86,7 +88,7 @@ def hold(dealer_hand: list, player_hand: list):
     dealer_hand_value = get_hand_value(dealer_hand)
     player_hand_value = get_hand_value(player_hand)
 
-    while dealer_hand_value < 17 or dealer_hand_value <= player_hand_value:
+    while dealer_hand_value < 17 or (dealer_hand_value < 17 and dealer_hand_value <= player_hand_value):
         dealer_hand = hit(dealer_hand)
         dealer_hand_value = get_hand_value(dealer_hand)
 
@@ -99,7 +101,7 @@ def get_player_choice() -> str:
 
     while passed == 0:
         try:
-            player_choice = input('Your choice:')
+            player_choice = input('Your choice [h, s, q]: ')
             player_choice = str(player_choice)
 
             player_choice = player_choice.lower()
@@ -111,12 +113,22 @@ def get_player_choice() -> str:
         except Exception as e:
             print('Error: ', repr(e))
 
+    if player_choice == 'q':
+        quit()
+
     return player_choice
 
 
+def clear_screen():
+    for _ in range(200):
+        print('\n')
+
+
 def print_hands(dealer_hand, player_hand):
-    print('P: ', player_hand, '\n' + 'D: ', dealer_hand, '\n')
-    print('P: ', get_hand_value(player_hand), '\n' + 'D: ', get_hand_value(dealer_hand), '\n')
+    clear_screen()
+
+    print('Player: ', player_hand, '\n' + 'Dealer: ', dealer_hand, '\n\n\n')
+    print('Player: ', get_hand_value(player_hand), '\n' + 'Dealer: ', get_hand_value(dealer_hand), '\n\n\n')
 
 
 def main():
@@ -143,7 +155,8 @@ def main():
             dealer_hand = hold(dealer_hand, player_hand)
 
         print_hands(dealer_hand, player_hand)
-        done = check_result(player_hand, dealer_hand)
+
+        done = check_result(player_hand, dealer_hand, player_choice)
 
 
 if __name__ == "__main__":
